@@ -2,7 +2,7 @@
 
 TensorFlow implementation of [Part-of-Speech Tagging for Twitter with Adversarial Neural Networks](http://jkx.fudan.edu.cn/~qzhang/paper/emnlp2017.pdf). 
 
-![compgraph](./img/architecture.pdf)
+!(./img/architecture.pdf)
 
 The code is partially referred to https://github.com/mkroutikov/tf-lstm-char-cnn and https://github.com/shucunt/domain_adaptation
 
