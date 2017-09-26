@@ -121,8 +121,7 @@ def load_data(file_name,dataname,max_sentnece_length,max_word_length):
                 word_char = []
                 mask = []
 
-            # onesplit = []
-            # labelsplit = []
+
 ##############################################################################
     word_tensors = {}
     char_tensors = {}
@@ -132,13 +131,7 @@ def load_data(file_name,dataname,max_sentnece_length,max_word_length):
         assert len(input_word[fname]) == len(input_char[fname])
         assert len(input_word[fname]) == len(input_label[fname])
         print('tranforming numpy array:',fname)
-        # for sentence in input_word[fname]:
-        #     try:
-        #         word_tensors[fname] = np.append(word_tensors[fname],np.array(sentence, dtype=np.int32),axis=0)
-        #     except ValueError:
-        #         file=open('testtxt','w')
-        #         file.write(str(sentence))
-        #         assert 1==2
+
         word_tensors[fname] = np.array(input_word[fname],dtype=np.int32)
         char_tensors[fname] = np.zeros([len(input_char[fname]), max_sentnece_length, max_word_length], dtype=np.int32)
         label_tensors[fname] = np.array(input_label[fname], dtype=np.int32)
@@ -169,7 +162,7 @@ class DataReader:
         #for better reshape
         reduced_length = (length // batch_size) * batch_size
         word_tensor1 = word_tensor[:reduced_length,:]
-        self.word_tensor2 = word_tensor[reduced_length:, :]#not use, because use batch_size =1 when test
+        self.word_tensor2 = word_tensor[reduced_length:, :]
         char_tensor1 = char_tensor[:reduced_length, :,:]
         self.char_tensor2 = char_tensor[reduced_length:, :, :]
         mask_tensor1 = mask_tensor[:reduced_length, :]

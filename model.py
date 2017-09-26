@@ -166,16 +166,11 @@ class Model():
                 except KeyError:
                     #model embedding size
 
-                    # file.write(item.lower().encode('utf8'))
-                    # file.write('\n')
-
                     wordembed_in_pretrain.append(np.random.rand(200))
                     b+=1
 
         print('there are %d words not in model'%b)
-        # file.close()
-        # construct embedding matrix
-        # check whether embedding can change
+
         self.word_embedding= tf.Variable(np.array(wordembed_in_pretrain),trainable=True,name='word_embedding',dtype=tf.float32)
 
         #input word embedding=[batch_size,num_unroll_steps,word_embedding]
@@ -201,7 +196,6 @@ class Model():
         input_cnn = tdnn(input_embedded_s, self.kernels, self.kernel_features)
 
         ''' Maybe apply Highway '''
-        #highway_layers=3
         if args.highway_layers > 0:
             input_cnn = highway(input_cnn, input_cnn.get_shape()[-1], num_layers=args.highway_layers)
 
@@ -214,10 +208,6 @@ class Model():
             lstm_fw_cell = tf.contrib.rnn.BasicLSTMCell(args.rnn_size, forget_bias=1.0)
             # Backward direction cell
             lstm_bw_cell = tf.contrib.rnn.BasicLSTMCell(args.rnn_size, forget_bias=1.0)
-
-
-            # self.initial_rnn_fwstate = lstm_fw_cell.zero_state(args.batch_size, dtype=tf.float32)
-            # self.initial_rnn_bwstate = lstm_bw_cell.zero_state(args.batch_size, dtype=tf.float32)
 
             # outputs_size:[batch_size, max_time, output_size]
             outputs, state = tf.nn.bidirectional_dynamic_rnn(lstm_fw_cell, lstm_bw_cell, input_cnn2, sequence_length=self.sentence_length, dtype=tf.float32)
@@ -235,17 +225,6 @@ class Model():
             initial_state = [tf.contrib.rnn.LSTMStateTuple(initial_cstate, initial_hstate)] * 3
 
 
-            # _,initial_hstate0 = tf.split(1,2,outputs[0])
-            # initial_hstate1,_ = tf.split(1,2,outputs[-1])
-            # initial_hstate = tf.concat(1,[initial_hstate0,initial_hstate1])
-            # print('state shape',initial_state.get_shape())
-            # print('cstate shape',initial_hstate.get_shape())
-
-
-            # decoder_inputs = tf.zeros([args.batch_size, 2 * args.rnn_size])
-            # decoder_inputs = decoder_inputs + tf.unpack(input_embedded_word,axis=1)
-            # decoder_inputs = decoder_inputs[0:-1]
-
             decoder_labels = tf.one_hot(self.input_word, args.word_vocab_size)
             decoder_labels = tf.reshape(decoder_labels, [-1, args.word_vocab_size])
 
@@ -255,10 +234,7 @@ class Model():
 
             decoder_outputs = tf.stack(decoder_outputs)  # [time,batch,2*hidden]
             decoder_outputs = tf.reshape(decoder_outputs, [-1, 2 * args.rnn_size])  # [time*batch,2*hidden]
-            # decoder_W1 = tf.get_variable('decoder_W1',[2*args.decoder_rnn_size,600])
-            # decoder_b1 = tf.get_variable('decoder_b1',[600])
 
-            #    decoder_hidden = tf.tanh(tf.matmul(decoder_outputs,decoder_W1)+decoder_b1)
 
             decoder_W2 = tf.get_variable('decoder_W2', [2 * args.rnn_size, args.word_vocab_size])
             decoder_b2 = tf.get_variable('decoder_b2', [args.word_vocab_size])
@@ -280,13 +256,7 @@ class Model():
                     if idx > 0:
                         scope.reuse_variables()
                     layer1 = tf.nn.softmax(linear(output, args.num_classes))
-                    #w_c = tf.Variable(tf.truncated_normal([100,args.num_classes],stddev = 0.1))
-                    #b_c = tf.Variable(tf.zeros(args.num_classes)+0.1)
-                    #layer2 = tf.nn.softmax(tf.matmul(layer1,w_c)+b_c)
-                # with tf.variable_scope('WordEmbedding2') as scope:
-                #     if idx > 0:
-                #         scope.reuse_variables()
-                #     layer2 = tf.nn.softmax(linear2(layer1, args.num_classes))
+
                 self.logits1.append(layer1)
 
             # y_pred1[batch_size, time, num_classes]
@@ -321,10 +291,7 @@ class Model():
                     w_d = tf.Variable(tf.truncated_normal([100, 2], stddev=0.1))
                     b_d = tf.Variable(tf.zeros(2) + 0.1)
                     layer2 = tf.nn.softmax(tf.matmul(layer1, w_d) + b_d)
-                # with tf.variable_scope('WordEmbedding4') as scope:
-                #     if idx > 0:
-                #         scope.reuse_variables()
-                #     layer2 = tf.nn.softmax(linear2(layer1, 2))
+
                 self.logits2.append(layer2)
 
             y_pred2 = tf.reshape(self.logits2, [-1, 2])
@@ -348,5 +315,3 @@ class Model():
         self.autoencoder_domain_cost = self.domain_loss + self.autoencoder_loss
         self.total_train_op = tf.train.AdagradOptimizer(0.1).minimize(self.total_loss)
         self.domain_train_op = tf.train.AdagradOptimizer(0.1).minimize(self.autoencoder_domain_cost)
-
-
