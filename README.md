@@ -4,7 +4,7 @@ TensorFlow implementation of [Part-of-Speech Tagging for Twitter with Adversaria
 
 ![compgraph](./img/architecture.png)
 
-The code is partially referred to https://github.com/mkroutikov/tf-lstm-char-cnn and https://github.com/shucunt/domain_adaptation
+The code is partially referred to https://github.com/mkroutikov/tf-lstm-char-cnn and https://github.com/shucunt/domain_adaptation.
 
 ## Requirements
 
