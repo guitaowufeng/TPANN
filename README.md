@@ -13,7 +13,7 @@ The code is partially referred to https://github.com/mkroutikov/tf-lstm-char-cnn
 - Tensorflow 1.0 
 - Gensim
 
-- In addition, anyone who want to run these codes should download the word embedding and saved model from http://pan.baidu.com/s/1boSlljL. The folder 'word2vec' and the files 'adv_model...' should be placed at 'TPANN/.'
+- In addition, anyone who want to run these codes should download the word embedding and the saved model from http://pan.baidu.com/s/1boSlljL. The folder 'word2vec' and the files 'adv_model...' should be placed at 'TPANN/.'.
 
 ## Usage
 
